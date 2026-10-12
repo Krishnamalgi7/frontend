@@ -158,8 +158,12 @@ export default function PhoneDetailsPage() {
             >
               <img
                 key={selectedImage || phone.image}
-                src={selectedImage || phone.image}
+                src={selectedImage || phone.image || "/phone-placeholder.png"}
                 alt={phone.name}
+                onError={(event) => {
+                  event.currentTarget.onerror = null;
+                  event.currentTarget.src = "/phone-placeholder.png";
+                }}
                 className={`max-h-[360px] w-full object-contain ${
                   imageDirection === "next"
                     ? "phone-image-slide-next"
