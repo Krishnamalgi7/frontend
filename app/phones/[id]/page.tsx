@@ -184,8 +184,12 @@ export default function PhoneDetailsPage() {
                   }}
                 >
                   <img
-                    src={image}
+                    src={image || "/phone-placeholder.png"}
                     alt={`${phone.name} image ${index + 1}`}
+                    onError={(event) => {
+                      event.currentTarget.onerror = null;
+                      event.currentTarget.src = "/phone-placeholder.png";
+                    }}
                     className="h-full w-full object-contain"
                   />
                 </button>
@@ -245,7 +249,7 @@ export default function PhoneDetailsPage() {
                 className="text-sm"
                 style={{ color: "var(--text-secondary)" }}
               >
-                {phone.averageRating?.toFixed(1) || "0.0"} 
+                {phone.averageRating?.toFixed(1) || "0.0"}
                 {/* {phone.ratingCount || 0} ratings) */}
               </span>
             </div>
