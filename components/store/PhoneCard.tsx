@@ -61,10 +61,14 @@ function PhoneCard({
         }}
       >
         <img
-          src={image}
-          alt={name}
-          className="h-full w-full rounded-xl object-contain"
-        />
+  src={image || "/phone-placeholder.png"}
+  alt={name}
+  onError={(event) => {
+    event.currentTarget.onerror = null;
+    event.currentTarget.src = "/phone-placeholder.png";
+  }}
+  className="h-full w-full rounded-xl object-contain"
+/>
       </div>
 
       {/* Brand */}
