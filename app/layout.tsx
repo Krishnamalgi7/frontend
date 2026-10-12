@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 
 export const dynamic = "force-dynamic";
 
+
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const response = await fetch(
@@ -29,18 +30,22 @@ export async function generateMetadata(): Promise<Metadata> {
 
     const data = await response.json();
 
+    const logoUrl = data.logo
+      ? `${process.env.NEXT_PUBLIC_API_URL}${data.logo}`
+      : "/logo.png";
+
     return {
-      title: data.brandName,
-      description: `${data.brandName} - Your trusted mobile store`,
+      title: data.brandName || "Phone Store",
+      description: `${data.brandName || "Phone Store"} - Your trusted mobile store`,
       icons: {
-        icon: `${process.env.NEXT_PUBLIC_API_URL}${data.logo}`,
+        icon: logoUrl,
       },
     };
   } catch (error) {
     console.error("Failed to fetch store Data:", error);
 
     return {
-      title: "Nova",
+      title: "Phone Store",
       description: "Your trusted mobile store",
       icons: {
         icon: "/logo.png",
@@ -48,6 +53,7 @@ export async function generateMetadata(): Promise<Metadata> {
     };
   }
 }
+
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
