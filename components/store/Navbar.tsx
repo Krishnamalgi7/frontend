@@ -163,8 +163,12 @@ export default function Navbar() {
 
         <a href="#home" className="flex items-center gap-3">
           <img
-            src={logo}
+            src={logo || "/logo.png"}
             alt={brandName}
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = "/logo.png";
+            }}
             className="h-10 w-auto object-contain rounded-xl"
           />
 
@@ -316,7 +320,7 @@ export default function Navbar() {
 
       {isMenuOpen && (
         <div
-        ref={menuRef}
+          ref={menuRef}
           className="absolute left-50 right-3 top-[calc(100%+15px)] z-50 rounded-2xl border p-3 shadow-lg md:hidden"
           style={{
             backgroundColor: "var(--bg-primary)",
