@@ -38,7 +38,9 @@ export async function generateMetadata(): Promise<Metadata> {
       title: data.brandName || "Phone Store",
       description: `${data.brandName || "Phone Store"} - Your trusted mobile store`,
       icons: {
-        icon: logoUrl,
+        icon: data.logo
+          ? `${process.env.NEXT_PUBLIC_API_URL}${data.logo}`
+          : "/logo.png",
       },
     };
   } catch (error) {
