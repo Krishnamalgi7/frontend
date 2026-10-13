@@ -5,24 +5,30 @@ import { useEffect } from "react";
 
 export default function FaviconFallback() {
   useEffect(() => {
-    const favicon = document.querySelector<HTMLLinkElement>(
+    const fallbackUrl = "/logo.png?v=2";
+    const faviconLinks = document.querySelectorAll<HTMLLinkElement>(
       'link[rel~="icon"]',
     );
 
-    if (!favicon) return;
+    if (faviconLinks.length === 0) {
+      const link = document.createElement("link");
+      link.rel = "icon";
+      link.type = "image/png";
+      link.href = fallbackUrl;
+      document.head.appendChild(link);
+      return;
+    }
 
-    const fallbackUrl = "/logo.png";
-    const image = new Image();
+    faviconLinks.forEach((link) => {
+      const image = new Image();
 
-    image.onerror = () => {
-      favicon.href = fallbackUrl;
-    };
+      image.onerror = () => {
+        link.type = "image/png";
+        link.href = fallbackUrl;
+      };
 
-    image.src = favicon.href;
-
-    return () => {
-      image.onerror = null;
-    };
+      image.src = link.href;
+    });
   }, []);
 
   return null;
