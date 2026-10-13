@@ -431,23 +431,16 @@ export default function ManagePhoneList({
               >
                 {/* IMAGE */}
                 <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl">
-                  {phone.image ? (
-                    <img
-                      src={phone.image}
-                      alt={phone.name}
-                      className="h-full w-full object-contain"
-                    />
-                  ) : (
-                    <span
-                      className="text-xs"
-                      style={{
-                        color: "var(--text-secondary)",
-                      }}
-                    >
-                      No image
-                    </span>
-                  )}
-                </div>
+  <img
+    src={phone.image || "/phone-placeholder.png"}
+    alt={phone.name}
+    onError={(event) => {
+      event.currentTarget.onerror = null;
+      event.currentTarget.src = "/phone-placeholder.png";
+    }}
+    className="h-full w-full object-contain"
+  />
+</div>
 
                 {/* DETAILS */}
                 <div className="flex-1">

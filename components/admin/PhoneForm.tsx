@@ -635,12 +635,22 @@ export default function PhoneForm({
         data.append("imageRemoved", "true");
       }
 
-      if (removedAdditionalImages.length > 0) {
+      
+if (removedAdditionalImages.length > 0) {
+  const normalizedImages = removedAdditionalImages.map((image) => {
+    try {
+      return decodeURIComponent(new URL(image).pathname);
+    } catch {
+      return image;
+    }
+  });
+
   data.append(
     "removedAdditionalImages",
-    JSON.stringify(removedAdditionalImages),
+    JSON.stringify(normalizedImages),
   );
 }
+
 
 
       const url = editingPhone
