@@ -26,8 +26,18 @@ export async function generateMetadata(): Promise<Metadata> {
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch store Data");
-    }
+  const errorDetails = await response.text();
+
+  console.error("Store settings API error:", {
+    status: response.status,
+    statusText: response.statusText,
+    details: errorDetails,
+  });
+
+  throw new Error(
+    `Failed to fetch store settings: ${response.status}`,
+  );
+}
 
     const data = await response.json();
 
