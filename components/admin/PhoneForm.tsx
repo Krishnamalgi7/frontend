@@ -1456,6 +1456,10 @@ if (removedAdditionalImages.length > 0) {
           ? existingAdditionalImages[index]!
           : `${process.env.NEXT_PUBLIC_API_URL}${existingAdditionalImages[index]}`
       }
+      onError={(event) => {
+  event.currentTarget.onerror = null;
+  event.currentTarget.src = "/phone-placeholder.png";
+}}
       alt={`Additional image ${index + 1}`}
       className="h-full w-full object-contain"
     />
@@ -1589,6 +1593,10 @@ if (removedAdditionalImages.length > 0) {
 
               <div className="flex h-48 items-center justify-center overflow-hidden rounded-lg">
                 <img
+                onError={(event) => {
+  event.currentTarget.onerror = null;
+  event.currentTarget.src = "/phone-placeholder.png";
+}}
                   src={imagePreview}
                   alt="Phone preview"
                   className="h-full max-w-full object-contain"
@@ -1631,6 +1639,10 @@ if (removedAdditionalImages.length > 0) {
                         src={URL.createObjectURL(file)}
                         alt={`Additional image ${index + 1}`}
                         className="h-full w-full object-contain"
+                        onError={(event) => {
+                          event.currentTarget.onerror = null;
+                          event.currentTarget.src = "/phone-placeholder.png";
+                        }}
                       />
 
                       <span
