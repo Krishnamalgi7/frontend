@@ -99,9 +99,19 @@ const InvoicePreview = forwardRef<InvoicePreviewRef, InvoicePreviewProps>(
             <div className="flex min-w-0 items-start gap-5">
               {invoice.storeLogo && (
                 <img
-                  src={`${process.env.NEXT_PUBLIC_API_URL}${invoice.storeLogo}`}
+                  src={
+                    invoice.storeLogo
+                      ? invoice.storeLogo.startsWith("http")
+                        ? invoice.storeLogo
+                        : `${process.env.NEXT_PUBLIC_API_URL}${invoice.storeLogo}`
+                      : "/logo.png"
+                  }
                   alt={`${invoice.storeName} logo`}
                   className="h-30 w-30 shrink-0 rounded-xl object-contain mt-6"
+                  onError={(event) => {
+                    event.currentTarget.onerror = null;
+                    event.currentTarget.src = "/logo.png";
+                  }}
                 />
               )}
 

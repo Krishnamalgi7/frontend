@@ -14,6 +14,7 @@ export default function StoreBrandingForm() {
   const [brandName, setBrandName] = useState("");
   const [logo, setLogo] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState("");
+const [removeLogo, setRemoveLogo] = useState(false);
 
   //21-9-26
   const [gstNumber, setGstNumber] = useState("");
@@ -81,7 +82,9 @@ export default function StoreBrandingForm() {
 
       if (logo) {
         data.append("logo", logo);
-      }
+      } else if (removeLogo) {
+  data.append("removeLogo", "true");
+}
 
       const response = await fetch(`${API_BASE_URL}/store-settings`, {
         method: "PUT",
@@ -393,6 +396,7 @@ export default function StoreBrandingForm() {
                         event.preventDefault();
                         setLogo(null);
                         setLogoPreview("");
+                        setRemoveLogo(true);
                       }}
                       className="absolute right-2 top-2 flex cursor-pointer items-center justify-center rounded-full border p-1.5 transition-opacity hover:opacity-70"
                       style={{
@@ -443,6 +447,7 @@ export default function StoreBrandingForm() {
 
                     setLogo(file);
                     setLogoPreview(URL.createObjectURL(file));
+                    setRemoveLogo(false);
                   }}
                   className="sr-only"
                 />
@@ -476,6 +481,7 @@ export default function StoreBrandingForm() {
                 setLogo(null);
                 setLogoPreview("");
                 setMessage("");
+                setRemoveLogo(false);
               }}
               className="flex cursor-pointer items-center gap-2 rounded-xl bg-black px-3 py-3 font-semibold text-white transition hover:bg-red-500 hover:text-white"
               style={{
