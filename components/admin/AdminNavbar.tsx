@@ -12,6 +12,7 @@ import {
   X,
   Sun,
   Receipt,
+  BellRing,
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
@@ -36,6 +37,9 @@ export default function AdminNavbar() {
   }, []);
 
   const [theme, setTheme] = useState("default");
+
+  const [pendingStockAlerts, setPendingStockAlerts] = useState(0);
+
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
 
@@ -47,6 +51,48 @@ export default function AdminNavbar() {
 
     setTheme(savedTheme);
     document.documentElement.setAttribute("data-theme", savedTheme);
+  }, []);
+
+  useEffect(() => {
+    const fetchPendingStockAlerts = async () => {
+      try {
+        const token = localStorage.getItem("adminToken");
+
+        if (!token) {
+          setPendingStockAlerts(0);
+          return;
+        }
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/stock-notifications/admin/all`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (!response.ok) {
+          return;
+        }
+
+        const notifications = await response.json();
+
+        if (Array.isArray(notifications)) {
+          setPendingStockAlerts(
+            notifications.filter((item) => item.status === "pending").length,
+          );
+        }
+      } catch (error) {
+        console.error("Failed to fetch pending stock alerts:", error);
+      }
+    };
+
+    fetchPendingStockAlerts();
+
+    const intervalId = window.setInterval(fetchPendingStockAlerts, 30000);
+
+    return () => window.clearInterval(intervalId);
   }, []);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -174,6 +220,44 @@ export default function AdminNavbar() {
           >
             <Settings size={17} />
             Settings
+          </button>
+
+          {/* STOCK ALERTS */}
+          <button
+            type="button"
+            onClick={() => handleNavigation("/admin/stock-alerts")}
+            className={`group relative flex h-10 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 hover:scale-105 ${
+              pathname.startsWith("/admin/stock-alerts") ? "active" : ""
+            }`}
+            style={{
+              color: "var(--text-primary)",
+              borderColor: pathname.startsWith("/admin/stock-alerts")
+                ? "var(--accent-color)"
+                : "transparent",
+              backgroundColor: pathname.startsWith("/admin/stock-alerts")
+                ? "var(--bg-secondary)"
+                : "transparent",
+            }}
+            aria-label={`Stock alerts, ${pendingStockAlerts} pending requests`}
+            title={`${pendingStockAlerts} pending stock requests`}
+          >
+            <BellRing
+              size={20}
+              className="transition-transform duration-200 group-hover:rotate-[-10deg]"
+            />
+
+            {pendingStockAlerts > 0 && (
+              <span
+                className="absolute -right-1 -top-1 flex h-[19px] min-w-[19px] items-center justify-center rounded-full border-2 px-1 text-[10px] font-bold leading-none"
+                style={{
+                  backgroundColor: "var(--accent-color)",
+                  color: "#111111",
+                  borderColor: "var(--bg-primary)",
+                }}
+              >
+                {pendingStockAlerts > 99 ? "99+" : pendingStockAlerts}
+              </span>
+            )}
           </button>
 
           {/* THEME TOGGLE */}
@@ -364,6 +448,21 @@ export default function AdminNavbar() {
               >
                 <MessageSquare size={18} />
                 View Queries
+              </button>
+
+              {/* STOCK ALERTS */}
+              <button
+                type="button"
+                onClick={() => handleNavigation("/admin/stock-alerts")}
+                className={`nav-link flex items-center justify-left gap-3 rounded-xl px-4 py-2 text-left transition focus:bg-blue-300 focus:text-white${
+                  pathname.startsWith("/admin/stock-alerts") ? "active" : ""
+                }`}
+                style={{
+                  color: "var(--text-primary)",
+                }}
+              >
+                <BellRing size={18} />
+                Stock Alerts
               </button>
 
               {/* LOGOUT */}
