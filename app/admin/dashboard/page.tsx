@@ -91,7 +91,7 @@ const [totalPhones, setTotalPhones] = useState(0);
       setPhones(phonesData.phones);
       setTotalPhones(phonesData.pagination?.totalItems || 0);
 
-      setContacts(contactsData);
+      setContacts(contactsData.contacts);
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
     }finally {

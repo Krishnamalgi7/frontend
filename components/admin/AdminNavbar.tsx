@@ -16,12 +16,15 @@ import {
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
+import { io } from "socket.io-client";
 
 export default function AdminNavbar() {
   const router = useRouter();
   const pathname = usePathname();
 
   const menuRef = useRef<HTMLDivElement>(null);
+
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -53,47 +56,51 @@ export default function AdminNavbar() {
     document.documentElement.setAttribute("data-theme", savedTheme);
   }, []);
 
-  useEffect(() => {
-    const fetchPendingStockAlerts = async () => {
-      try {
-        const token = localStorage.getItem("adminToken");
+useEffect(() => {
+  const fetchPendingStockAlerts = async () => {
+    try {
+      const token = localStorage.getItem("adminToken");
 
-        if (!token) {
-          setPendingStockAlerts(0);
-          return;
-        }
-
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/stock-notifications/admin/all`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        if (!response.ok) {
-          return;
-        }
-
-        const notifications = await response.json();
-
-        if (Array.isArray(notifications)) {
-          setPendingStockAlerts(
-            notifications.filter((item) => item.status === "pending").length,
-          );
-        }
-      } catch (error) {
-        console.error("Failed to fetch pending stock alerts:", error);
+      if (!token) {
+        setPendingStockAlerts(0);
+        return;
       }
-    };
 
-    fetchPendingStockAlerts();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/stock-notifications/admin/all`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
-    const intervalId = window.setInterval(fetchPendingStockAlerts, 30000);
+      if (!response.ok) return;
 
-    return () => window.clearInterval(intervalId);
-  }, []);
+      const notifications = await response.json();
+
+      if (Array.isArray(notifications)) {
+        setPendingStockAlerts(
+          notifications.filter((item) => item.status === "pending").length,
+        );
+      }
+    } catch (error) {
+      console.error("Failed to fetch pending stock alerts:", error);
+    }
+  };
+
+  fetchPendingStockAlerts();
+
+  const socket = io(
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
+  );
+
+  socket.on("new-stock-notification", fetchPendingStockAlerts);
+
+  return () => {
+    socket.disconnect();
+  };
+}, []);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
