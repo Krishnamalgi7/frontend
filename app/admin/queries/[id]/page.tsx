@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState , useRef} from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, ChevronDown, MessageSquareText, Send } from "lucide-react";
 import Loader from "../../../../components/Loader";
@@ -17,6 +17,11 @@ export default function CustomerQueryDetailsPage() {
     phone: string;
     message: string;
     reply?: string;
+    messages?: {
+      sender: "customer" | "admin";
+      text: string;
+      createdAt?: string;
+    }[];
     status: "pending" | "in_progress" | "completed";
     createdAt?: string;
     updatedAt?: string;
@@ -247,7 +252,10 @@ export default function CustomerQueryDetailsPage() {
                   <p className=" font-semibold">{contact.phone}</p>
                 </div>
 
-                <div ref={statusDropdownRef} className="relative self-start sm:self-auto">
+                <div
+                  ref={statusDropdownRef}
+                  className="relative self-start sm:self-auto"
+                >
                   <button
                     type="button"
                     disabled={updatingStatus}
@@ -333,51 +341,87 @@ export default function CustomerQueryDetailsPage() {
                   borderColor: "var(--border-color)",
                 }}
               >
-                <div className="flex justify-start">
-                  <div className="max-w-[85%]">
-                    <p
-                      className="mb-1 text-xs font-medium"
-                      style={{ color: "var(--text-secondary)" }}
-                    >
-                      {contact.name} · Customer
-                    </p>
-                    <div
-                      className="rounded-xl rounded-tl-sm border px-3 py-2"
-                      style={{
-                        backgroundColor: "var(--bg-secondary)",
-                        borderColor: "var(--border-color)",
-                      }}
-                    >
-                      <p className="whitespace-pre-wrap break-words text-sm leading-5">
-                        {contact.message}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <h2 className="mb-4 text-base font-bold">Conversation</h2>
 
-                {contact.reply && (
-                  <div className="mt-4 flex justify-end">
-                    <div className="max-w-[85%]">
-                      <p
-                        className="mb-1 text-right text-xs font-medium"
-                        style={{ color: "var(--text-secondary)" }}
-                      >
-                        Sigmato Support · Admin
-                      </p>
-                      <div
-                        className="rounded-xl rounded-tr-sm px-3 py-2"
-                        style={{
-                          backgroundColor: "var(--accent-color)",
-                          color: "#FFFFFF",
-                        }}
-                      >
-                        <p className="whitespace-pre-wrap break-words text-sm leading-5">
-                          {contact.reply}
+                <div className="space-y-4">
+                  {(contact.messages?.length
+                    ? contact.messages
+                    : [
+                        {
+                          sender: "customer" as const,
+                          text: contact.message,
+                          createdAt: contact.createdAt,
+                        },
+                        ...(contact.reply
+                          ? [
+                              {
+                                sender: "admin" as const,
+                                text: contact.reply,
+                                createdAt: contact.updatedAt,
+                              },
+                            ]
+                          : []),
+                      ]
+                  ).map((item, index) => (
+                    <div
+                      key={`${item.sender}-${item.createdAt ?? index}-${index}`}
+                      className={`flex ${
+                        item.sender === "admin"
+                          ? "justify-end"
+                          : "justify-start"
+                      }`}
+                    >
+                      <div className="max-w-[85%]">
+                        <p
+                          className={`mb-1 text-xs font-medium ${
+                            item.sender === "admin" ? "text-right" : "text-left"
+                          }`}
+                          style={{ color: "var(--text-secondary)" }}
+                        >
+                          {item.sender === "admin"
+                            ? "Support · Admin"
+                            : `${contact.name} · Customer`}
                         </p>
+
+                        <div
+                          className={`rounded-xl border px-3 py-2 ${
+                            item.sender === "admin"
+                              ? "rounded-tr-sm"
+                              : "rounded-tl-sm"
+                          }`}
+                          style={{
+                            backgroundColor:
+                              item.sender === "admin"
+                                ? "var(--accent-color)"
+                                : "var(--bg-secondary)",
+                            borderColor: "var(--border-color)",
+                            color:
+                              item.sender === "admin"
+                                ? "#FFFFFF"
+                                : "var(--text-primary)",
+                          }}
+                        >
+                          <p className="whitespace-pre-wrap break-words text-sm leading-5">
+                            {item.text}
+                          </p>
+                        </div>
+
+                        {item.createdAt && (
+                          <p
+                            className={`mt-1 text-xs ${
+                              item.sender === "admin"
+                                ? "text-right"
+                                : "text-left"
+                            }`}
+                            style={{ color: "var(--text-secondary)" }}
+                          >
+                            {new Date(item.createdAt).toLocaleString()}
+                          </p>
+                        )}
                       </div>
                     </div>
-                  </div>
-                )}
+                  ))}
+                </div>
               </section>
 
               <section
