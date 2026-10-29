@@ -85,6 +85,14 @@ export default function AdminNavbar() {
   >([]);
   const [selectedNotification, setSelectedNotification] =
     useState<StockNotification | null>(null);
+
+  // Pagination for
+  const [queryPage, setQueryPage] = useState(1);
+  const [stockPage, setStockPage] = useState(1);
+
+  const [queryTotalPages, setQueryTotalPages] = useState(0);
+  const [stockTotalPages, setStockTotalPages] = useState(0);
+
   const [notificationLoading, setNotificationLoading] = useState(false);
 
   const [readNotificationIds, setReadNotificationIds] = useState<string[]>([]);
@@ -121,11 +129,11 @@ export default function AdminNavbar() {
         const [queryResponse, stockResponse, summaryResponse] =
           await Promise.all([
             fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/api/contacts/admin/notifications`,
+              `${process.env.NEXT_PUBLIC_API_URL}/api/contacts/admin/notifications?page=${queryPage}&limit=3`,
               { headers },
             ),
             fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/api/stock-notifications/admin/pending`,
+              `${process.env.NEXT_PUBLIC_API_URL}/api/stock-notifications/admin/pending?page=${stockPage}&limit=3`,
               { headers },
             ),
             fetch(
@@ -136,16 +144,26 @@ export default function AdminNavbar() {
 
         if (queryResponse.ok) {
           const queryData = await queryResponse.json();
+
           setQueryNotifications(
             Array.isArray(queryData.notifications)
               ? queryData.notifications
               : [],
           );
+
+          setQueryTotalPages(queryData.pagination?.totalPages ?? 0);
         }
 
         if (stockResponse.ok) {
           const stockData = await stockResponse.json();
-          setStockNotifications(Array.isArray(stockData) ? stockData : []);
+
+          setStockNotifications(
+            Array.isArray(stockData.notifications)
+              ? stockData.notifications
+              : [],
+          );
+
+          setStockTotalPages(stockData.pagination?.totalPages ?? 0);
         }
 
         if (summaryResponse.ok) {
@@ -173,7 +191,7 @@ export default function AdminNavbar() {
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [queryPage, stockPage]);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -372,9 +390,7 @@ export default function AdminNavbar() {
 
         {isNotificationOpen && (
           <div
-            
-className="fixed left-1/2 top-[120px] z-[100] flex max-h-[calc(100dvh-280px)] w-[calc(100vw-24px)] max-w-[860px] -translate-x-1/2 flex-col overflow-hidden rounded-2xl border shadow-2xl md:max-h-[calc(100dvh-280px)] md:w-[calc(100vw-48px)]"
-
+            className="fixed left-1/2 top-[120px] z-[100] flex max-h-[calc(100dvh-240px)] w-[calc(100vw-24px)] max-w-[860px] -translate-x-1/2 flex-col overflow-hidden rounded-2xl border shadow-2xl md:max-h-[calc(100dvh-240px)] md:w-[calc(100vw-48px)]"
             style={{
               backgroundColor: "var(--bg-primary)",
               borderColor: "var(--border-color)",
@@ -385,7 +401,6 @@ className="fixed left-1/2 top-[120px] z-[100] flex max-h-[calc(100dvh-280px)] w-
               className="flex min-h-12 shrink-0 items-center justify-end border-b px-3 py-2"
               style={{ borderColor: "var(--border-color)" }}
             >
-
               <button
                 type="button"
                 onClick={() => setIsNotificationOpen(false)}
@@ -396,7 +411,7 @@ className="fixed left-1/2 top-[120px] z-[100] flex max-h-[calc(100dvh-280px)] w-
               </button>
             </div>
 
-            <div className="grid min-h-0 flex-1 grid-cols-1 overflow-y-auto md:grid-cols-2">
+            <div className="grid min-h-0 flex-1 grid-cols-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid-cols-2">
               {/* Query notifications */}
               <section
                 className="border-b p-4 md:border-b-0 md:border-r"
@@ -411,7 +426,7 @@ className="fixed left-1/2 top-[120px] z-[100] flex max-h-[calc(100dvh-280px)] w-
                     className="rounded-full px-2 py-1 text-xs"
                     style={{ backgroundColor: "var(--bg-secondary)" }}
                   >
-                    {queryNotifications.length}
+                    {queryNotifications.length} Pending
                   </span>
                 </div>
 
@@ -476,11 +491,11 @@ className="fixed left-1/2 top-[120px] z-[100] flex max-h-[calc(100dvh-280px)] w-
                             {item.status.replace("_", " ")}
                           </span>
                         </div>
-                        <p className="mt-1 line-clamp-2 text-xs opacity-70">
+                        <p className="mt-1 line-clamp-1 text-xs opacity-70">
                           {item.message}
                         </p>
                         <span
-                          className="mt-2 inline-block text-xs font-medium"
+                          className="mt-2 inline-block text-xs font-medium cursor-pointer"
                           style={{ color: "var(--accent-color)" }}
                         >
                           View query →
@@ -489,8 +504,36 @@ className="fixed left-1/2 top-[120px] z-[100] flex max-h-[calc(100dvh-280px)] w-
                     ))}
                   </div>
                 )}
+                
+                {queryTotalPages > 1 && (
+                  <div className="mt-3 flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      disabled={queryPage <= 1}
+                      onClick={() => setQueryPage((page) => page - 1)}
+                      className="rounded-lg border px-3 py-2 text-xs disabled:opacity-40"
+                      style={{ borderColor: "var(--border-color)" }}
+                    >
+                      Previous
+                    </button>
 
-                <button
+                    <span className="text-xs opacity-70">
+                      Page {queryPage} of {queryTotalPages}
+                    </span>
+
+                    <button
+                      type="button"
+                      disabled={queryPage >= queryTotalPages}
+                      onClick={() => setQueryPage((page) => page + 1)}
+                      className="rounded-lg border px-3 py-2 text-xs disabled:opacity-40"
+                      style={{ borderColor: "var(--border-color)" }}
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+
+                {/* <button
                   type="button"
                   onClick={() => {
                     setIsNotificationOpen(false);
@@ -500,7 +543,7 @@ className="fixed left-1/2 top-[120px] z-[100] flex max-h-[calc(100dvh-280px)] w-
                   style={{ borderColor: "var(--border-color)" }}
                 >
                   View all queries
-                </button>
+                </button> */}
               </section>
 
               {/* Stock notifications */}
@@ -514,7 +557,7 @@ className="fixed left-1/2 top-[120px] z-[100] flex max-h-[calc(100dvh-280px)] w-
                     className="rounded-full px-2 py-1 text-xs"
                     style={{ backgroundColor: "var(--bg-secondary)" }}
                   >
-                    {pendingStockAlerts} pending
+                    {pendingStockAlerts} Pending
                   </span>
                 </div>
 
@@ -568,7 +611,7 @@ className="fixed left-1/2 top-[120px] z-[100] flex max-h-[calc(100dvh-280px)] w-
                                     backgroundColor: "var(--accent-color)",
                                   }}
                                 >
-                                  View Phone
+                                  View Phone →
                                 </button>
                               )}
                             </div>
@@ -581,6 +624,33 @@ className="fixed left-1/2 top-[120px] z-[100] flex max-h-[calc(100dvh-280px)] w-
                   </div>
                 )}
 
+{stockTotalPages > 1 && (
+  <div className="mt-3 flex items-center justify-between gap-2">
+    <button
+      type="button"
+      disabled={stockPage <= 1}
+      onClick={() => setStockPage((page) => page - 1)}
+      className="rounded-lg border px-3 py-2 text-xs cursor-pointer"
+      style={{ borderColor: "var(--border-color)" }}
+    >
+      Previous
+    </button>
+
+    <span className="text-xs opacity-70">
+      Page {stockPage} of {stockTotalPages}
+    </span>
+
+    <button
+      type="button"
+      disabled={stockPage >= stockTotalPages}
+      onClick={() => setStockPage((page) => page + 1)}
+      className="rounded-lg border px-3 py-2 text-xs cursor-pointer"
+      style={{ borderColor: "var(--border-color)" }}
+    >
+      Next
+    </button>
+  </div>
+)}
                 {selectedNotification && (
                   <div
                     className="mt-3 rounded-xl border p-3"
