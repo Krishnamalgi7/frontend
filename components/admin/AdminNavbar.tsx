@@ -372,7 +372,9 @@ export default function AdminNavbar() {
 
         {isNotificationOpen && (
           <div
-            className="fixed left-1/2 top-1/2 z-[100] flex max-h-[82dvh] w-[calc(100vw-24px)] max-w-[860px] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border shadow-2xl md:top-60 md:max-h-[calc(100dvh-260px)] md:w-[calc(100vw-48px)]"
+            
+className="fixed left-1/2 top-[120px] z-[100] flex max-h-[calc(100dvh-280px)] w-[calc(100vw-24px)] max-w-[860px] -translate-x-1/2 flex-col overflow-hidden rounded-2xl border shadow-2xl md:max-h-[calc(100dvh-280px)] md:w-[calc(100vw-48px)]"
+
             style={{
               backgroundColor: "var(--bg-primary)",
               borderColor: "var(--border-color)",
