@@ -61,14 +61,14 @@ function PhoneCard({
         }}
       >
         <img
-  src={image || "/phone-placeholder.png"}
-  alt={name}
-  onError={(event) => {
-    event.currentTarget.onerror = null;
-    event.currentTarget.src = "/phone-placeholder.png";
-  }}
-  className="h-full w-full rounded-xl object-contain"
-/>
+          src={image || "/phone-placeholder.png"}
+          alt={name}
+          onError={(event) => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = "/phone-placeholder.png";
+          }}
+          className="h-full w-full rounded-xl object-contain"
+        />
       </div>
 
       {/* Brand */}
@@ -159,7 +159,11 @@ function PhoneCard({
               color: "var(--text-primary)",
             }}
           >
-            {quantity ?? 0}
+            {(quantity ?? 0) === 0 ? (
+              <span className="font-bold text-red-600">Out of Stock</span>
+            ) : (
+              quantity
+            )}
           </p>
         </div>
 
