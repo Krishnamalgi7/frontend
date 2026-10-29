@@ -390,7 +390,7 @@ export default function AdminNavbar() {
 
         {isNotificationOpen && (
           <div
-            className="fixed left-1/2 top-[120px] z-[100] flex max-h-[calc(100dvh-240px)] w-[calc(100vw-24px)] max-w-[860px] -translate-x-1/2 flex-col overflow-hidden rounded-2xl border shadow-2xl md:max-h-[calc(100dvh-240px)] md:w-[calc(100vw-48px)]"
+            className="fixed left-1/2 top-[120px] z-[100] flex max-h-[calc(100dvh-220px)] w-[calc(100vw-24px)] max-w-[860px] -translate-x-1/2 flex-col overflow-hidden rounded-2xl border shadow-2xl md:max-h-[calc(100dvh-220px)] md:w-[calc(100vw-48px)]"
             style={{
               backgroundColor: "var(--bg-primary)",
               borderColor: "var(--border-color)",
@@ -398,18 +398,29 @@ export default function AdminNavbar() {
             }}
           >
             <div
-              className="flex min-h-12 shrink-0 items-center justify-end border-b px-3 py-2"
-              style={{ borderColor: "var(--border-color)" }}
-            >
-              <button
-                type="button"
-                onClick={() => setIsNotificationOpen(false)}
-                className="rounded-3xl p-2 transition cursor-pointer"
-                aria-label="Close notifications"
-              >
-                <X size={18} />
-              </button>
-            </div>
+  className="flex min-h-16 shrink-0 items-center justify-between border-b px-4 py-3"
+  style={{ borderColor: "var(--border-color)" }}
+>
+  <div className="flex flex-col gap-1">
+    <h2 className="flex items-center gap-2 text-base font-semibold">
+      <MessageSquareText size={18} />
+      Notifications
+    </h2>
+
+    <p className="text-xs opacity-70">
+      Manage customer queries and stock requests
+    </p>
+  </div>
+
+  <button
+    type="button"
+    onClick={() => setIsNotificationOpen(false)}
+    className="cursor-pointer rounded-full p-2 transition-colors duration-200 hover:bg-[var(--accent-color)]"
+    aria-label="Close notifications"
+  >
+    <X size={18} />
+  </button>
+</div>
 
             <div className="grid min-h-0 flex-1 grid-cols-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid-cols-2">
               {/* Query notifications */}
@@ -504,7 +515,7 @@ export default function AdminNavbar() {
                     ))}
                   </div>
                 )}
-                
+
                 {queryTotalPages > 1 && (
                   <div className="mt-3 flex items-center justify-between gap-2">
                     <button
@@ -606,7 +617,7 @@ export default function AdminNavbar() {
                                       `/admin/phones/edit/${item.phoneId!._id}`,
                                     );
                                   }}
-                                  className="ml-auto shrink-0 rounded-3xl px-4 py-1.5 text-xs font-medium text-white transition hover:opacity-90 cursor-pointer"
+                                  className="ml-auto shrink-0 rounded-3xl px-4 py-1.5 text-xs font-medium text-black transition hover:opacity-90 cursor-pointer"
                                   style={{
                                     backgroundColor: "var(--accent-color)",
                                   }}
@@ -624,33 +635,33 @@ export default function AdminNavbar() {
                   </div>
                 )}
 
-{stockTotalPages > 1 && (
-  <div className="mt-3 flex items-center justify-between gap-2">
-    <button
-      type="button"
-      disabled={stockPage <= 1}
-      onClick={() => setStockPage((page) => page - 1)}
-      className="rounded-lg border px-3 py-2 text-xs cursor-pointer"
-      style={{ borderColor: "var(--border-color)" }}
-    >
-      Previous
-    </button>
+                {stockTotalPages > 1 && (
+                  <div className="mt-3 flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      disabled={stockPage <= 1}
+                      onClick={() => setStockPage((page) => page - 1)}
+                      className="rounded-lg border px-3 py-2 text-xs cursor-pointer"
+                      style={{ borderColor: "var(--border-color)" }}
+                    >
+                      Previous
+                    </button>
 
-    <span className="text-xs opacity-70">
-      Page {stockPage} of {stockTotalPages}
-    </span>
+                    <span className="text-xs opacity-70">
+                      Page {stockPage} of {stockTotalPages}
+                    </span>
 
-    <button
-      type="button"
-      disabled={stockPage >= stockTotalPages}
-      onClick={() => setStockPage((page) => page + 1)}
-      className="rounded-lg border px-3 py-2 text-xs cursor-pointer"
-      style={{ borderColor: "var(--border-color)" }}
-    >
-      Next
-    </button>
-  </div>
-)}
+                    <button
+                      type="button"
+                      disabled={stockPage >= stockTotalPages}
+                      onClick={() => setStockPage((page) => page + 1)}
+                      className="rounded-lg border px-3 py-2 text-xs cursor-pointer"
+                      style={{ borderColor: "var(--border-color)" }}
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
                 {selectedNotification && (
                   <div
                     className="mt-3 rounded-xl border p-3"
