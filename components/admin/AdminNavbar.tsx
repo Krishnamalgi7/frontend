@@ -398,29 +398,29 @@ export default function AdminNavbar() {
             }}
           >
             <div
-  className="flex min-h-16 shrink-0 items-center justify-between border-b px-4 py-3"
-  style={{ borderColor: "var(--border-color)" }}
->
-  <div className="flex flex-col gap-1">
-    <h2 className="flex items-center gap-2 text-base font-semibold">
-      <MessageSquareText size={18} />
-      Notifications
-    </h2>
+              className="flex min-h-16 shrink-0 items-center justify-between border-b px-4 py-3"
+              style={{ borderColor: "var(--border-color)" }}
+            >
+              <div className="flex flex-col gap-1">
+                <h2 className="flex items-center gap-2 text-base font-semibold">
+                  <MessageSquareText size={18} />
+                  Notifications
+                </h2>
 
-    <p className="text-xs opacity-70">
-      Manage customer queries and stock requests
-    </p>
-  </div>
+                <p className="text-xs opacity-70">
+                  Manage customer queries and stock requests
+                </p>
+              </div>
 
-  <button
-    type="button"
-    onClick={() => setIsNotificationOpen(false)}
-    className="cursor-pointer rounded-full p-2 transition-colors duration-200 hover:bg-[var(--accent-color)]"
-    aria-label="Close notifications"
-  >
-    <X size={18} />
-  </button>
-</div>
+              <button
+                type="button"
+                onClick={() => setIsNotificationOpen(false)}
+                className="cursor-pointer rounded-full p-2 transition-colors duration-200 hover:bg-[var(--accent-color)]"
+                aria-label="Close notifications"
+              >
+                <X size={18} />
+              </button>
+            </div>
 
             <div className="grid min-h-0 flex-1 grid-cols-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid-cols-2">
               {/* Query notifications */}

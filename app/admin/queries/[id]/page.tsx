@@ -25,6 +25,7 @@ export default function CustomerQueryDetailsPage() {
     status: "pending" | "in_progress" | "completed";
     createdAt?: string;
     updatedAt?: string;
+    adminNotificationReadAt?: string | null;
   };
 
   const [contact, setContact] = useState<Contact | null>(null);
@@ -82,6 +83,30 @@ export default function CustomerQueryDetailsPage() {
         }
 
         setContact(data.contact);
+
+        // Mark the admin notification as read if it is still unread.
+        if (data.contact.adminNotificationReadAt == null) {
+          try {
+            const readResponse = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/api/contacts/${queryId}/admin-notification/read`,
+              {
+                method: "PATCH",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              },
+            );
+
+            if (!readResponse.ok) {
+              console.error("Failed to mark query notification as read");
+            }
+          } catch (readError) {
+            console.error(
+              "Failed to mark query notification as read:",
+              readError,
+            );
+          }
+        }
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to load customer query.",

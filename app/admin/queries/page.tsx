@@ -66,7 +66,7 @@ export default function CustomerQueriesPage() {
         search: searchTerm.trim(),
         status: statusFilter,
         page: String(currentPage),
-        limit: "20",
+        limit: "10",
       });
 
       const response = await fetch(
@@ -142,7 +142,7 @@ useEffect(() => {
             search: searchTerm.trim(),
             status: statusFilter,
             page: String(currentPage),
-            limit: "20",
+            limit: "10",
           });
 
           const response = await fetch(

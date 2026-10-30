@@ -2,10 +2,7 @@
 
 import Loader from "../../../components/Loader";
 
-import {
-  MessageSquare,
-  Smartphone,
-} from "lucide-react";
+import { MessageSquare, Smartphone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -14,28 +11,32 @@ export default function AdminDashboardPage() {
   const [adminName, setAdminName] = useState("");
   const [phones, setPhones] = useState<any[]>([]);
   const [contacts, setContacts] = useState<any[]>([]);
-const [loading, setLoading] = useState(true);
-const [totalPhones, setTotalPhones] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [totalPhones, setTotalPhones] = useState(0);
 
   //Count phone brands
   const brandCounts = phones.reduce((counts: Record<string, number>, phone) => {
-  const brand =
-    typeof phone.brandId === "object"
-      ? phone.brandId?.name
-      : phone.brand || "Unknown";
+    const brand =
+      typeof phone.brandId === "object"
+        ? phone.brandId?.name
+        : phone.brand || "Unknown";
 
-  const brandName = brand || "Unknown";
+    const brandName = brand || "Unknown";
 
-  counts[brandName] = (counts[brandName] || 0) + 1;
+    counts[brandName] = (counts[brandName] || 0) + 1;
 
-  return counts;
-}, {});
+    return counts;
+  }, {});
 
   //filter pending and update get in touch status
   const totalQueries = contacts.length;
 
   const pendingQueries = contacts.filter(
     (contact) => contact.status === "pending",
+  ).length;
+
+  const inProgressQueries = contacts.filter(
+    (contact) => contact.status === "in_progress",
   ).length;
 
   const completedQueries = contacts.filter(
@@ -64,7 +65,6 @@ const [totalPhones, setTotalPhones] = useState(0);
 
   const fetchDashboardData = async () => {
     try {
-      
       setLoading(true);
       const token = localStorage.getItem("adminToken");
 
@@ -94,9 +94,9 @@ const [totalPhones, setTotalPhones] = useState(0);
       setContacts(contactsData.contacts);
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
-    }finally {
-  setLoading(false);
-}
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCompleteQuery = async (contactId: string) => {
@@ -139,8 +139,8 @@ const [totalPhones, setTotalPhones] = useState(0);
   };
 
   if (loading) {
-  return <Loader />;
-}
+    return <Loader />;
+  }
 
   return (
     <main
@@ -239,7 +239,7 @@ const [totalPhones, setTotalPhones] = useState(0);
                 </div>
 
                 <div
-                  className="mt-5 grid grid-cols-2 gap-4 border-t pt-4"
+                  className="mt-5 grid grid-cols-3 gap-4 border-t pt-4"
                   style={{ borderColor: "var(--border-color)" }}
                 >
                   <div>
@@ -251,6 +251,18 @@ const [totalPhones, setTotalPhones] = useState(0);
                     </p>
                     <p className="mt-1 text-xl font-semibold">
                       {pendingQueries}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p
+                      className="text-sm"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      In Progress
+                    </p>
+                    <p className="mt-1 text-xl font-semibold">
+                      {inProgressQueries}
                     </p>
                   </div>
 
