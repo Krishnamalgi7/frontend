@@ -2,7 +2,7 @@
 
 import Loader from "../../../components/Loader";
 
-import { MessageSquare, Smartphone } from "lucide-react";
+import { MessageSquare, PackageX, Smartphone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -13,6 +13,11 @@ export default function AdminDashboardPage() {
   const [contacts, setContacts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalPhones, setTotalPhones] = useState(0);
+  const [totalOutOfStock, setTotalOutOfStock] = useState(0);
+
+  const [outOfStockBrands, setOutOfStockBrands] = useState<
+    { brandName: string; count: number }[]
+  >([]);
 
   //Count phone brands
   const brandCounts = phones.reduce((counts: Record<string, number>, phone) => {
@@ -72,14 +77,25 @@ export default function AdminDashboardPage() {
         return;
       }
 
-      const [phonesResponse, contactsResponse] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/phones?limit=50`),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/contacts`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }),
-      ]);
+      const [phonesResponse, contactsResponse, outOfStockResponse] =
+        await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/phones?limit=50`),
+
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/contacts`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+
+          fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/phones/admin/out-of-stock-summary`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          ),
+        ]);
 
       if (!phonesResponse.ok || !contactsResponse.ok) {
         throw new Error("Failed to fetch dashboard data");
@@ -92,6 +108,16 @@ export default function AdminDashboardPage() {
       setTotalPhones(phonesData.pagination?.totalItems || 0);
 
       setContacts(contactsData.contacts);
+
+      if (outOfStockResponse.ok) {
+        const outOfStockData = await outOfStockResponse.json();
+
+        setTotalOutOfStock(outOfStockData.totalOutOfStock || 0);
+
+        setOutOfStockBrands(
+          Array.isArray(outOfStockData.brands) ? outOfStockData.brands : [],
+        );
+      }
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
     } finally {
@@ -156,7 +182,7 @@ export default function AdminDashboardPage() {
           </p>
 
           <div className="mt-8">
-            <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {/* Total Phones */}
               <div
                 className="rounded-2xl border p-6 shadow-sm"
@@ -204,6 +230,66 @@ export default function AdminDashboardPage() {
                         <span className="font-semibold">{count}</span>
                       </div>
                     ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Out of Stock Phones */}
+              <div
+                className="rounded-2xl border p-6 shadow-sm"
+                style={{
+                  backgroundColor: "var(--bg-secondary)",
+                  borderColor: "var(--border-color)",
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="flex h-11 w-11 items-center justify-center rounded-xl"
+                    style={{
+                      backgroundColor: "var(--bg-primary)",
+                      color: "#DC6464",
+                    }}
+                  >
+                    <PackageX size={22} />
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold">Out of Stock</h3>
+                    <p
+                      className="text-2xl font-bold"
+                      style={{ color: "#DC6464" }}
+                    >
+                      {totalOutOfStock}
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  className="mt-5 border-t pt-4"
+                  style={{ borderColor: "var(--border-color)" }}
+                >
+                  <div className="space-y-2">
+                    {Object.keys(brandCounts).map((brand) => {
+                      const outOfStockCount =
+                        outOfStockBrands.find(
+                          (item) => item.brandName === brand,
+                        )?.count ?? 0;
+
+                      return (
+                        <div
+                          key={brand}
+                          className="flex items-center justify-between text-sm"
+                        >
+                          <span style={{ color: "var(--text-secondary)" }}>
+                            {brand}
+                          </span>
+
+                          <span className="font-semibold">
+                            {outOfStockCount}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

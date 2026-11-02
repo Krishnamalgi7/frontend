@@ -42,6 +42,8 @@ type Phone = {
 
   rom?: ReferenceValue;
   romId?: ReferenceValue;
+
+  quantity: number;
 };
 
 type ManagePhoneListProps = {
@@ -76,7 +78,6 @@ export default function ManagePhoneList({
 
   const [loading, setLoading] = useState(true);
 
-
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
 
@@ -88,7 +89,6 @@ export default function ManagePhoneList({
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
 
   const [priceChanged, setPriceChanged] = useState(false);
-
 
   const [brandVariants, setBrandVariants] = useState<MasterItem[]>([]);
   const handleFiltersChange = useCallback((filters: PhoneFilterValues) => {
@@ -152,8 +152,6 @@ export default function ManagePhoneList({
         //   setLoading(true);
         // }
 
- 
-
         const params = new URLSearchParams();
 
         if (debouncedSearch.trim()) {
@@ -196,7 +194,6 @@ export default function ManagePhoneList({
         console.error("Error fetching phones:", error);
       } finally {
         setLoading(false);
-
       }
     };
 
@@ -298,8 +295,8 @@ export default function ManagePhoneList({
           }
 
           if (data.length === 1) {
-    return data[0]._id;
-  }
+            return data[0]._id;
+          }
 
           return "";
         });
@@ -431,16 +428,16 @@ export default function ManagePhoneList({
               >
                 {/* IMAGE */}
                 <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl">
-  <img
-    src={phone.image || "/phone-placeholder.png"}
-    alt={phone.name}
-    onError={(event) => {
-      event.currentTarget.onerror = null;
-      event.currentTarget.src = "/phone-placeholder.png";
-    }}
-    className="h-full w-full object-contain"
-  />
-</div>
+                  <img
+                    src={phone.image || "/phone-placeholder.png"}
+                    alt={phone.name}
+                    onError={(event) => {
+                      event.currentTarget.onerror = null;
+                      event.currentTarget.src = "/phone-placeholder.png";
+                    }}
+                    className="h-full w-full object-contain"
+                  />
+                </div>
 
                 {/* DETAILS */}
                 <div className="flex-1">
@@ -493,9 +490,9 @@ export default function ManagePhoneList({
                           }}
                         >
                           ₹
-                          {Math.round(phone.totalPrice ?? phone.price).toLocaleString(
-                            "en-IN",
-                          )}
+                          {Math.round(
+                            phone.totalPrice ?? phone.price,
+                          ).toLocaleString("en-IN")}
                         </span>
                       </>
                     ) : (
@@ -524,6 +521,36 @@ export default function ManagePhoneList({
                     <span>•</span>
 
                     <span>{getReferenceText(rom)} ROM</span>
+                  </div>
+
+                  <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                    {phone.quantity <= 0 ? (
+                      <span
+                        className="rounded-full px-3 py-1 font-semibold"
+                        style={{
+                          backgroundColor: "rgba(220, 80, 80, 0.12)",
+                          color: "#DC5050",
+                        }}
+                      >
+                        Out of Stock
+                      </span>
+                    ) : (
+                      <span
+                        className="rounded-full px-3 py-1 font-semibold"
+                        style={{
+                          backgroundColor: "rgba(34, 160, 100, 0.12)",
+                          color: "#229F64",
+                        }}
+                      >
+                        In Stock
+                      </span>
+                    )}
+
+                    {phone.quantity > 0 && (
+                      <span style={{ color: "var(--text-secondary)" }}>
+                        Quantity: {phone.quantity}
+                      </span>
+                    )}
                   </div>
                 </div>
 
