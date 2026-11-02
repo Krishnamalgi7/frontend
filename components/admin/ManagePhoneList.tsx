@@ -542,7 +542,7 @@ export default function ManagePhoneList({
                           color: "#229F64",
                         }}
                       >
-                        In Stock
+                        ಪ್ರಮಾಣ
                       </span>
                     )}
 
