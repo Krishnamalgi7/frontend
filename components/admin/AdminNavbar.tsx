@@ -32,14 +32,16 @@ type QueryNotification = {
 
 type StockNotification = {
   _id: string;
-  status: "pending" | "notified" | "cancelled";
+  requestCount: number;
   createdAt: string;
   phoneId: {
     _id: string;
     name: string;
     quantity?: number;
   } | null;
-  customerId: {
+  status?: "pending" | "notified" | "cancelled";
+  adminReadAt?: string | null;
+  customerId?: {
     name?: string;
   } | null;
 };
@@ -205,6 +207,42 @@ export default function AdminNavbar() {
   const handleNavigation = (path: string) => {
     router.push(path);
     setIsMenuOpen(false);
+  };
+
+  // socket pending
+  const handleViewStockPhone = async (item: StockNotification) => {
+    setIsNotificationOpen(false);
+
+    if (!item.adminReadAt) {
+      try {
+        const token = localStorage.getItem("adminToken");
+
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/stock-notifications/admin/${item._id}/read`,
+          {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to mark stock notification as seen");
+        }
+
+        setStockNotifications((current) =>
+          current.filter((notification) => notification._id !== item._id),
+        );
+
+        setTotalNotificationCount((current) => Math.max(0, current - 1));
+        setPendingStockAlerts((current) => Math.max(0, current - 1));
+      } catch (error) {
+        console.error("Failed to mark stock notification as seen:", error);
+      }
+    }
+
+    handleNavigation(`/admin/phones/edit/${item.phoneId!._id}`);
   };
 
   return (
@@ -597,7 +635,8 @@ export default function AdminNavbar() {
                             </p>
 
                             <p className="mt-1 text-xs opacity-70">
-                              Customer: {item.customerId?.name || "Unknown"}
+                              {item.requestCount}{" "}
+                              {item.requestCount === 1 ? "request" : "requests"}
                             </p>
 
                             <div className=" flex w-full items-center  gap-3">
@@ -613,9 +652,7 @@ export default function AdminNavbar() {
                                   type="button"
                                   onClick={() => {
                                     setIsNotificationOpen(false);
-                                    handleNavigation(
-                                      `/admin/phones/edit/${item.phoneId!._id}`,
-                                    );
+                                    handleViewStockPhone(item);
                                   }}
                                   className="ml-auto shrink-0 rounded-3xl px-4 py-1.5 text-xs font-medium text-black transition hover:opacity-90 cursor-pointer"
                                   style={{
